@@ -8,14 +8,14 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.arroyo.nolberto.popularmovies.Model.MovieModel;
+import com.arroyo.nolberto.popularmovies.Model.Response;
 
 import java.util.ArrayList;
 
 public class MovieRecyclerViewAdapter extends RecyclerView.Adapter<MovieViewHolder>{
-    ArrayList<MovieModel> moviesList;
+    ArrayList<Response.MoviesModel> moviesList;
 
-    public MovieRecyclerViewAdapter(ArrayList<MovieModel> moviesList) {
+    public MovieRecyclerViewAdapter(ArrayList<Response.MoviesModel> moviesList) {
         this.moviesList = moviesList;
     }
 
