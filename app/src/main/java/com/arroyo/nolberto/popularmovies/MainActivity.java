@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 
 import com.arroyo.nolberto.popularmovies.Interfaces.PopularMoviesService;
 
@@ -35,13 +36,12 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        getPopularList();
         recyclerView = (RecyclerView)findViewById(R.id.recycler_view);
 
-        rvLayoutManager = new GridLayoutManager(this,2, LinearLayoutManager.VERTICAL,false);
+        rvLayoutManager = new GridLayoutManager(this,2);
         recyclerView.setLayoutManager(rvLayoutManager);
-        rvAdapter = new MovieRecyclerViewAdapter(popularMoviesList);
-        recyclerView.setAdapter(rvAdapter);
-        getPopularList();
+
 
     }
 
@@ -62,8 +62,10 @@ public class MainActivity extends AppCompatActivity {
 
                 @Override
                 public void onResponse(Call<com.arroyo.nolberto.popularmovies.Model.Response> call, Response<com.arroyo.nolberto.popularmovies.Model.Response> response) {
-                    popularMoviesList = new ArrayList<>();
                     popularMoviesList = (ArrayList<com.arroyo.nolberto.popularmovies.Model.Response.MoviesModel>) response.body().getResults();
+                    rvAdapter = new MovieRecyclerViewAdapter(popularMoviesList);
+                    recyclerView.setAdapter(rvAdapter);
+                    Log.d("movies", "onResponse: "+ popularMoviesList.size());
                 }
 
                 @Override
