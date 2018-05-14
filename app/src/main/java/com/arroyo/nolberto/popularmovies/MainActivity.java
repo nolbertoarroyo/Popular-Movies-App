@@ -1,6 +1,7 @@
 package com.arroyo.nolberto.popularmovies;
 
 import android.content.Context;
+import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.support.v7.app.AppCompatActivity;
@@ -10,6 +11,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 
+import com.arroyo.nolberto.popularmovies.Interfaces.OnListItemClickListener;
 import com.arroyo.nolberto.popularmovies.Interfaces.PopularMoviesService;
 
 import java.lang.reflect.Array;
@@ -21,7 +23,7 @@ import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements OnListItemClickListener{
     private static String baseUrl = "https://api.themoviedb.org/";
     ArrayList<com.arroyo.nolberto.popularmovies.Model.Response.MoviesModel> popularMoviesList;
     private RecyclerView recyclerView;
@@ -41,6 +43,8 @@ public class MainActivity extends AppCompatActivity {
 
         rvLayoutManager = new GridLayoutManager(this,2);
         recyclerView.setLayoutManager(rvLayoutManager);
+
+
 
 
     }
@@ -63,8 +67,9 @@ public class MainActivity extends AppCompatActivity {
                 @Override
                 public void onResponse(Call<com.arroyo.nolberto.popularmovies.Model.Response> call, Response<com.arroyo.nolberto.popularmovies.Model.Response> response) {
                     popularMoviesList = (ArrayList<com.arroyo.nolberto.popularmovies.Model.Response.MoviesModel>) response.body().getResults();
-                    rvAdapter = new MovieRecyclerViewAdapter(popularMoviesList);
+                    rvAdapter = new MovieRecyclerViewAdapter(popularMoviesList,MainActivity.this);
                     recyclerView.setAdapter(rvAdapter);
+
                     Log.d("movies", "onResponse: "+ popularMoviesList.size());
                 }
 
@@ -79,5 +84,16 @@ public class MainActivity extends AppCompatActivity {
         } else {
             // the connection is not available
         }
+    }
+
+    @Override
+    public void onListItemClicked(int itemClickedPostion) {
+        com.arroyo.nolberto.popularmovies.Model.Response.MoviesModel selectedMovie = popularMoviesList.get(itemClickedPostion);
+        Intent startDetailActivityIntent = new Intent(MainActivity.this,MovieDetailActivity.class);
+        startDetailActivityIntent.putExtra("MovieSelected",selectedMovie );
+
+        startActivity(startDetailActivityIntent);
+
+
     }
 }

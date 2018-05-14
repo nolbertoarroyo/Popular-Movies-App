@@ -9,17 +9,22 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.arroyo.nolberto.popularmovies.Interfaces.OnListItemClickListener;
 import com.arroyo.nolberto.popularmovies.Model.Response;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 
-public class MovieRecyclerViewAdapter extends RecyclerView.Adapter<MovieViewHolder>{
+public class MovieRecyclerViewAdapter extends RecyclerView.Adapter<MovieRecyclerViewAdapter.MovieViewHolder>{
     ArrayList<Response.MoviesModel> moviesList;
     Context context;
+    final OnListItemClickListener movieSelected;
 
-    public MovieRecyclerViewAdapter(ArrayList<Response.MoviesModel> moviesList) {
+
+
+    public MovieRecyclerViewAdapter(ArrayList<Response.MoviesModel> moviesList, OnListItemClickListener itemSelected) {
         this.moviesList = moviesList;
+        this.movieSelected = itemSelected;
     }
 
     @Override
@@ -38,16 +43,10 @@ public class MovieRecyclerViewAdapter extends RecyclerView.Adapter<MovieViewHold
         Response.MoviesModel movie = moviesList.get(position);
         ImageView movieImage = holder.movieThumbnail;
         TextView title = holder.movieTitle;
-        String pic = "http://image.tmdb.org/t/p/w185"+ movie.getPoster_path();
+        String pic = context.getString(R.string.movie_image_base_url)+ movie.getPoster_path();
 
         Picasso.with(context).load(pic).into(movieImage);
         title.setText(movie.getOriginal_title());
-        Log.d("title", "onBindViewHolder: " + movie.getOriginal_title());
-
-
-
-
-
 
 
     }
@@ -58,16 +57,25 @@ public class MovieRecyclerViewAdapter extends RecyclerView.Adapter<MovieViewHold
     }
 
 
-}
-class MovieViewHolder extends RecyclerView.ViewHolder{
+    class MovieViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
 
-    ImageView movieThumbnail;
-    TextView movieTitle;
+        ImageView movieThumbnail;
+        TextView movieTitle;
 
-    public MovieViewHolder(View itemView) {
-        super(itemView);
+        public MovieViewHolder(View itemView) {
+            super(itemView);
 
-        this.movieThumbnail = (ImageView)itemView.findViewById(R.id.movie_thumbnail_iv);
-        this.movieTitle = (TextView)itemView.findViewById(R.id.movie_title_tv);
+            this.movieThumbnail = (ImageView)itemView.findViewById(R.id.movie_thumbnail_iv);
+            this.movieTitle = (TextView)itemView.findViewById(R.id.movie_title_tv);
+            itemView.setOnClickListener(this);
+        }
+
+        @Override
+        public void onClick(View v) {
+            int clickedPosition = getAdapterPosition();
+            movieSelected.onListItemClicked(clickedPosition);
+        }
+
     }
 }
+

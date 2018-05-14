@@ -1,5 +1,9 @@
 package com.arroyo.nolberto.popularmovies.Model;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
+import java.util.ArrayList;
 import java.util.List;
 
 public class Response {
@@ -48,7 +52,7 @@ public class Response {
         this.results = results;
     }
 
-    public static class MoviesModel {
+    public static class MoviesModel implements Parcelable {
         /**
          * vote_count : 2935
          * id : 299536
@@ -192,5 +196,69 @@ public class Response {
         public void setGenre_ids(List<Integer> genre_ids) {
             this.genre_ids = genre_ids;
         }
+
+        protected MoviesModel(Parcel in) {
+            vote_count = in.readInt();
+            id = in.readInt();
+            video = in.readByte() != 0x00;
+            vote_average = in.readDouble();
+            title = in.readString();
+            popularity = in.readDouble();
+            poster_path = in.readString();
+            original_language = in.readString();
+            original_title = in.readString();
+            backdrop_path = in.readString();
+            adult = in.readByte() != 0x00;
+            overview = in.readString();
+            release_date = in.readString();
+            if (in.readByte() == 0x01) {
+                genre_ids = new ArrayList<Integer>();
+                in.readList(genre_ids, Integer.class.getClassLoader());
+            } else {
+                genre_ids = null;
+            }
+        }
+
+        @Override
+        public int describeContents() {
+            return 0;
+        }
+
+        @Override
+        public void writeToParcel(Parcel dest, int flags) {
+            dest.writeInt(vote_count);
+            dest.writeInt(id);
+            dest.writeByte((byte) (video ? 0x01 : 0x00));
+            dest.writeDouble(vote_average);
+            dest.writeString(title);
+            dest.writeDouble(popularity);
+            dest.writeString(poster_path);
+            dest.writeString(original_language);
+            dest.writeString(original_title);
+            dest.writeString(backdrop_path);
+            dest.writeByte((byte) (adult ? 0x01 : 0x00));
+            dest.writeString(overview);
+            dest.writeString(release_date);
+            if (genre_ids == null) {
+                dest.writeByte((byte) (0x00));
+            } else {
+                dest.writeByte((byte) (0x01));
+                dest.writeList(genre_ids);
+            }
+        }
+
+        @SuppressWarnings("unused")
+        public static final Parcelable.Creator<MoviesModel> CREATOR = new Parcelable.Creator<MoviesModel>() {
+            @Override
+            public MoviesModel createFromParcel(Parcel in) {
+                return new MoviesModel(in);
+            }
+
+            @Override
+            public MoviesModel[] newArray(int size) {
+                return new MoviesModel[size];
+            }
+        };
     }
+
 }
