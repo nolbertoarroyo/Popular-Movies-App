@@ -1,4 +1,6 @@
 <resources>
     <string name="app_name">Popular Movies</string>
     <string name="movie_image_base_url">http://image.tmdb.org/t/p/w185</string>
+    <string name="detail_release_date">Release :</string>
+    <string name="detail_movie_overview">Overview</string>
 </resources>
