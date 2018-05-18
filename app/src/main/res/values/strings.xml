@@ -4,4 +4,6 @@
     <string name="detail_release_date">Release :</string>
     <string name="detail_movie_overview">Overview</string>
     <string name="menu_sort">Sort</string>
+    <string name="popular_menu">Popular</string>
+    <string name="top_rated_menu">Top Rated</string>
 </resources>

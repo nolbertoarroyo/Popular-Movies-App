@@ -31,6 +31,7 @@ public class MainActivity extends AppCompatActivity implements OnListItemClickLi
     private RecyclerView recyclerView;
     private MovieRecyclerViewAdapter rvAdapter;
     private RecyclerView.LayoutManager rvLayoutManager;
+    private String moviesToLoad;
 
 
 
@@ -40,7 +41,7 @@ public class MainActivity extends AppCompatActivity implements OnListItemClickLi
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        getPopularList();
+        getMovieList();
         recyclerView = (RecyclerView) findViewById(R.id.recycler_view);
 
         rvLayoutManager = new GridLayoutManager(this, 2);
@@ -56,14 +57,19 @@ public class MainActivity extends AppCompatActivity implements OnListItemClickLi
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        if(item.getItemId()== R.id.sort_item){
-            
+        if(item.getItemId()== R.id.menu_sort_popular){
+            moviesToLoad = "popular";
+            getMovieList();
 
+
+        }else if(item.getItemId()== R.id.menu_sort_rating){
+            moviesToLoad = "topRated";
+            getMovieList();
         }
         return super.onOptionsItemSelected(item);
     }
 
-    void getPopularList() {
+    void getMovieList() {
         ConnectivityManager connMgr = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
         if (networkInfo != null && networkInfo.isConnected()) {
@@ -74,7 +80,13 @@ public class MainActivity extends AppCompatActivity implements OnListItemClickLi
                     .build();
 
             PopularMoviesService service = retrofit.create(PopularMoviesService.class);
-            Call<com.arroyo.nolberto.popularmovies.Model.Response> call = service.getPopularMovies();
+            Call<com.arroyo.nolberto.popularmovies.Model.Response> call;
+            if (moviesToLoad == "topRated"){
+                call = service.getTopRatedMovies();
+
+            }else {
+                call = service.getPopularMovies();
+            }
 
             call.enqueue(new Callback<com.arroyo.nolberto.popularmovies.Model.Response>() {
 
@@ -84,7 +96,6 @@ public class MainActivity extends AppCompatActivity implements OnListItemClickLi
                     rvAdapter = new MovieRecyclerViewAdapter(popularMoviesList, MainActivity.this);
                     recyclerView.setAdapter(rvAdapter);
 
-                    Log.d("movies", "onResponse: " + popularMoviesList.size());
                 }
 
                 @Override

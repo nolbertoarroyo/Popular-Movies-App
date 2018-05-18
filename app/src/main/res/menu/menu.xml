@@ -7,6 +7,16 @@
         android:title="@string/menu_sort"
         android:orderInCategory="1"
         app:showAsAction="always"
-        />
+        >
+
+        <menu>
+            <item
+                android:id="@+id/menu_sort_popular"
+                android:title="@string/popular_menu" />
+            <item
+                android:id="@+id/menu_sort_rating"
+                android:title="@string/top_rated_menu" />
+        </menu>
+    </item>
 
 </menu>
