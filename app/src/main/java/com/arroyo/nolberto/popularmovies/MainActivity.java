@@ -27,13 +27,14 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 public class MainActivity extends AppCompatActivity implements OnListItemClickListener {
     private static String baseUrl = "https://api.themoviedb.org/";
-    ArrayList<com.arroyo.nolberto.popularmovies.Model.Response.MoviesModel> popularMoviesList;
+    private static String POPULAR_MOVIES_SETTING = "popular movies";
+    private static String TOP_RATED_MOVIES_SETTING = "top-rated movies";
+    private static String MOVIES_SELECTED_KEY = "MovieSelected";
+    private ArrayList<com.arroyo.nolberto.popularmovies.Model.Response.MoviesModel> popularMoviesList;
     private RecyclerView recyclerView;
     private MovieRecyclerViewAdapter rvAdapter;
     private RecyclerView.LayoutManager rvLayoutManager;
     private String moviesToLoad;
-
-
 
 
     @Override
@@ -49,21 +50,22 @@ public class MainActivity extends AppCompatActivity implements OnListItemClickLi
 
 
     }
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu,menu);
+        getMenuInflater().inflate(R.menu.menu, menu);
         return true;
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        if(item.getItemId()== R.id.menu_sort_popular){
-            moviesToLoad = "popular";
+        if (item.getItemId() == R.id.menu_sort_popular) {
+            moviesToLoad = POPULAR_MOVIES_SETTING;
             getMovieList();
 
 
-        }else if(item.getItemId()== R.id.menu_sort_rating){
-            moviesToLoad = "topRated";
+        } else if (item.getItemId() == R.id.menu_sort_rating) {
+            moviesToLoad = TOP_RATED_MOVIES_SETTING;
             getMovieList();
         }
         return super.onOptionsItemSelected(item);
@@ -81,10 +83,10 @@ public class MainActivity extends AppCompatActivity implements OnListItemClickLi
 
             PopularMoviesService service = retrofit.create(PopularMoviesService.class);
             Call<com.arroyo.nolberto.popularmovies.Model.Response> call;
-            if (moviesToLoad == "topRated"){
+            if (moviesToLoad == TOP_RATED_MOVIES_SETTING) {
                 call = service.getTopRatedMovies();
 
-            }else {
+            } else {
                 call = service.getPopularMovies();
             }
 
@@ -114,7 +116,7 @@ public class MainActivity extends AppCompatActivity implements OnListItemClickLi
     public void onListItemClicked(int itemClickedPostion) {
         com.arroyo.nolberto.popularmovies.Model.Response.MoviesModel selectedMovie = popularMoviesList.get(itemClickedPostion);
         Intent startDetailActivityIntent = new Intent(MainActivity.this, MovieDetailActivity.class);
-        startDetailActivityIntent.putExtra("MovieSelected", selectedMovie);
+        startDetailActivityIntent.putExtra(MOVIES_SELECTED_KEY, selectedMovie);
 
         startActivity(startDetailActivityIntent);
 

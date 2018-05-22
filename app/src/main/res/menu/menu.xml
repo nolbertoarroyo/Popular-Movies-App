@@ -4,10 +4,9 @@
 
     <item
         android:id="@+id/sort_item"
-        android:title="@string/menu_sort"
         android:orderInCategory="1"
-        app:showAsAction="always"
-        >
+        android:title="@string/menu_sort"
+        app:showAsAction="always">
 
         <menu>
             <item

@@ -12,7 +12,7 @@ import com.squareup.picasso.Picasso;
 
 public class MovieDetailActivity extends AppCompatActivity {
     private ImageView moviePoster;
-    private TextView overViewTv, movieTitleTv, movieReleaseDateTv;
+    private TextView overViewTv, movieTitleTv, movieReleaseDateTv, movieRatingTv;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -28,14 +28,17 @@ public class MovieDetailActivity extends AppCompatActivity {
         overViewTv = (TextView) findViewById(R.id.movie_description_tv);
         movieTitleTv = (TextView) findViewById(R.id.detail_movie_title_tv);
         movieReleaseDateTv = (TextView) findViewById(R.id.movie_release_date_tv);
+        movieRatingTv = (TextView) findViewById(R.id.movie_rating_tv);
 
         Intent receivedIntent = getIntent();
         Response.MoviesModel movie = receivedIntent.getParcelableExtra("MovieSelected");
 
         overViewTv.setText(movie.getOverview());
         movieTitleTv.setText(movie.getOriginal_title());
-        String pic = getApplicationContext().getString(R.string.movie_image_base_url) + movie.getPoster_path();
+        String pic = getApplicationContext().getString(R.string.movie_image_base_url) + movie.getBackdrop_path();
         movieReleaseDateTv.setText(movie.getRelease_date());
+        double rating = movie.getVote_average();
+        movieRatingTv.setText(String.valueOf(rating));
 
         Picasso.with(this).load(pic).into(moviePoster);
 
