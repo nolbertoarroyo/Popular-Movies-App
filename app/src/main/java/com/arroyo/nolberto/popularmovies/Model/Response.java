@@ -6,6 +6,7 @@ import android.os.Parcelable;
 import java.util.ArrayList;
 import java.util.List;
 
+//generated using Gson plugin and http://www.parcelabler.com
 public class Response {
 
     /**

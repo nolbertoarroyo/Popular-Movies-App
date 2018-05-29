@@ -1,22 +1,23 @@
-package com.arroyo.nolberto.popularmovies;
+package com.arroyo.nolberto.popularmovies.Adapter;
 
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.arroyo.nolberto.popularmovies.Constants;
 import com.arroyo.nolberto.popularmovies.Interfaces.OnListItemClickListener;
 import com.arroyo.nolberto.popularmovies.Model.Response;
+import com.arroyo.nolberto.popularmovies.R;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 
 public class MovieRecyclerViewAdapter extends RecyclerView.Adapter<MovieRecyclerViewAdapter.MovieViewHolder>{
-    ArrayList<Response.MoviesModel> moviesList;
+    private ArrayList<Response.MoviesModel> moviesList;
     Context context;
     final OnListItemClickListener movieSelected;
 
@@ -43,7 +44,7 @@ public class MovieRecyclerViewAdapter extends RecyclerView.Adapter<MovieRecycler
         Response.MoviesModel movie = moviesList.get(position);
         ImageView movieImage = holder.movieThumbnail;
         TextView title = holder.movieTitle;
-        String pic = context.getString(R.string.movie_image_base_url)+ movie.getPoster_path();
+        String pic = Constants.MOVIE_POSTER_BASE_URL+ movie.getPoster_path();
 
         Picasso.with(context).load(pic).into(movieImage);
         title.setText(movie.getOriginal_title());

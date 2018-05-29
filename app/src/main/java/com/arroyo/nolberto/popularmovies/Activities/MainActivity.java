@@ -1,4 +1,4 @@
-package com.arroyo.nolberto.popularmovies;
+package com.arroyo.nolberto.popularmovies.Activities;
 
 import android.content.Context;
 import android.content.Intent;
@@ -7,16 +7,17 @@ import android.net.NetworkInfo;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.GridLayoutManager;
-import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Toast;
 
+import com.arroyo.nolberto.popularmovies.Adapter.MovieRecyclerViewAdapter;
+import com.arroyo.nolberto.popularmovies.Constants;
 import com.arroyo.nolberto.popularmovies.Interfaces.OnListItemClickListener;
 import com.arroyo.nolberto.popularmovies.Interfaces.PopularMoviesService;
+import com.arroyo.nolberto.popularmovies.R;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 
 import retrofit2.Call;
@@ -26,10 +27,6 @@ import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
 public class MainActivity extends AppCompatActivity implements OnListItemClickListener {
-    private static String baseUrl = "https://api.themoviedb.org/";
-    private static String POPULAR_MOVIES_SETTING = "popular movies";
-    private static String TOP_RATED_MOVIES_SETTING = "top-rated movies";
-    private static String MOVIES_SELECTED_KEY = "MovieSelected";
     private ArrayList<com.arroyo.nolberto.popularmovies.Model.Response.MoviesModel> popularMoviesList;
     private RecyclerView recyclerView;
     private MovieRecyclerViewAdapter rvAdapter;
@@ -42,11 +39,9 @@ public class MainActivity extends AppCompatActivity implements OnListItemClickLi
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        //get and display default movie list
         getMovieList();
-        recyclerView = (RecyclerView) findViewById(R.id.recycler_view);
-
-        rvLayoutManager = new GridLayoutManager(this, 2);
-        recyclerView.setLayoutManager(rvLayoutManager);
+        setRecyclerView();
 
 
     }
@@ -59,31 +54,33 @@ public class MainActivity extends AppCompatActivity implements OnListItemClickLi
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
+        // checks which setting is selected and makes api call for either popular movies or top rated movies
         if (item.getItemId() == R.id.menu_sort_popular) {
-            moviesToLoad = POPULAR_MOVIES_SETTING;
+            moviesToLoad = Constants.POPULAR_MOVIES_SETTING;
             getMovieList();
 
 
         } else if (item.getItemId() == R.id.menu_sort_rating) {
-            moviesToLoad = TOP_RATED_MOVIES_SETTING;
+            moviesToLoad = Constants.TOP_RATED_MOVIES_SETTING;
             getMovieList();
         }
         return super.onOptionsItemSelected(item);
     }
 
+    //method checks internet connection.  If connection is available Retrofit object is created to make api call and set recyclerView with received data
     void getMovieList() {
         ConnectivityManager connMgr = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
         if (networkInfo != null && networkInfo.isConnected()) {
 
             Retrofit retrofit = new Retrofit.Builder()
-                    .baseUrl(baseUrl)
+                    .baseUrl(Constants.MOVIE_BASE_URL)
                     .addConverterFactory(GsonConverterFactory.create())
                     .build();
 
             PopularMoviesService service = retrofit.create(PopularMoviesService.class);
             Call<com.arroyo.nolberto.popularmovies.Model.Response> call;
-            if (moviesToLoad == TOP_RATED_MOVIES_SETTING) {
+            if (moviesToLoad == Constants.TOP_RATED_MOVIES_SETTING) {
                 call = service.getTopRatedMovies();
 
             } else {
@@ -102,6 +99,9 @@ public class MainActivity extends AppCompatActivity implements OnListItemClickLi
 
                 @Override
                 public void onFailure(Call<com.arroyo.nolberto.popularmovies.Model.Response> call, Throwable t) {
+                    //toast lets user know that there was an error with receiving data from api
+
+                    Toast.makeText(MainActivity.this, R.string.service_unavailable, Toast.LENGTH_SHORT).show();
 
                 }
             });
@@ -109,17 +109,26 @@ public class MainActivity extends AppCompatActivity implements OnListItemClickLi
 
         } else {
             // the connection is not available
+            Toast.makeText(this, R.string.connection_unavailable, Toast.LENGTH_SHORT).show();
         }
     }
 
+    // Interface passes selected movie object to MovieDetailActivity
     @Override
     public void onListItemClicked(int itemClickedPostion) {
         com.arroyo.nolberto.popularmovies.Model.Response.MoviesModel selectedMovie = popularMoviesList.get(itemClickedPostion);
         Intent startDetailActivityIntent = new Intent(MainActivity.this, MovieDetailActivity.class);
-        startDetailActivityIntent.putExtra(MOVIES_SELECTED_KEY, selectedMovie);
+        startDetailActivityIntent.putExtra(Constants.MOVIES_SELECTED_KEY, selectedMovie);
 
         startActivity(startDetailActivityIntent);
 
+
+    }
+
+    void setRecyclerView() {
+        recyclerView = (RecyclerView) findViewById(R.id.recycler_view);
+        rvLayoutManager = new GridLayoutManager(this, 2);
+        recyclerView.setLayoutManager(rvLayoutManager);
 
     }
 }
