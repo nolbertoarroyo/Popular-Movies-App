@@ -10,4 +10,6 @@
     <string name="movie_rating_label">Rating :</string>
     <string name="connection_unavailable">Connection Unavailable</string>
     <string name="service_unavailable">Service Unavailable</string>
+    <string name="movie_poster_image_description">movie poster</string>
+    <string name="movie_backdrop_description">movie backdrop</string>
 </resources>
