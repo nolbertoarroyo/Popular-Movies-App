@@ -12,4 +12,6 @@
     <string name="service_unavailable">Service Unavailable</string>
     <string name="movie_poster_image_description">movie poster</string>
     <string name="movie_backdrop_description">movie backdrop</string>
+    <string name="reviews_title">Reviews</string>
+    <string name="trailers_title">Trailers</string>
 </resources>

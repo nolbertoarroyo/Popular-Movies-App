@@ -16,6 +16,8 @@ public class Constants {
     //retrofit GET
     public static final String GET_POPULAR_MOVIES = "3/movie/popular?api_key=";
     public static final String GET_TOP_RATED_MOVIES = "3/movie/top_rated?api_key=";
+    public static final String GET_MOVIE_VIDEO = "3/movie/{movie_id}/videos?api_key=";
+    public static final String GET_MOVIE_REVIEWS = "3/movie/{movie_id}/reviews?api_key=";
 
 
 }
