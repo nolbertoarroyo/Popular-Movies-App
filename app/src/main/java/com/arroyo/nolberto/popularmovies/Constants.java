@@ -12,6 +12,8 @@ public class Constants {
 
     public static final String MOVIE_BACKDROP_BASE_URL = "http://image.tmdb.org/t/p/w500";
     public static final String MOVIE_POSTER_BASE_URL = "http://image.tmdb.org/t/p/w185";
+    public static final String VIDEO_YOUTUBE_APP_BASE_URL = "vnd.youtube:";
+    public static final String VIDEO_YOUTUBE_BROWSER_BASE_URL = "http://www.youtube.com/watch?v=";
 
     //retrofit GET
     public static final String GET_POPULAR_MOVIES = "3/movie/popular?api_key=";

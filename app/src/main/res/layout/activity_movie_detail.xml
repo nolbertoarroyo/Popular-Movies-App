@@ -123,7 +123,11 @@
             android:id="@+id/trailer_recycler_view"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@id/trailers_title_tv"/>
+            android:layout_below="@id/trailers_title_tv"
+            android:scrollbars="horizontal"
+            android:scrollbarSize="2dp"
+            android:scrollbarThumbHorizontal="@color/colorAccent" />
+
         <TextView
             android:id="@+id/reviews_title_tv"
             android:layout_width="wrap_content"
