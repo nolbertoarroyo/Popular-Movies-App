@@ -41,7 +41,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 public class MovieDetailActivity extends AppCompatActivity implements OnTrailerClickListener{
     private ImageView moviePoster, movieBackdrop;
-    private TextView overViewTv, movieTitleTv, movieReleaseDateTv, movieRatingTv, reviewAuthorTitleTv;
+    private TextView overViewTv, movieTitleTv, movieReleaseDateTv, movieRatingTv;
     Response.MoviesModel movie;
     ArrayList<VideoReviews.Review>reviewsList;
     ArrayList<VideoResults.VideoData> videosList;
@@ -94,7 +94,6 @@ public class MovieDetailActivity extends AppCompatActivity implements OnTrailerC
         movieTitleTv = (TextView) findViewById(R.id.detail_movie_title_tv);
         movieReleaseDateTv = (TextView) findViewById(R.id.release_date_value_tv);
         movieRatingTv = (TextView) findViewById(R.id.movie_rating_value_tv);
-        reviewAuthorTitleTv = (TextView)findViewById(R.id.reviews_title_tv);
     }
 
     void getReviewsList() {

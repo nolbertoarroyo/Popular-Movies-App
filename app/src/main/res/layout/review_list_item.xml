@@ -7,11 +7,42 @@
     <TextView
         android:id="@+id/author_tv"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        style="@style/detailTextViewsStyle"
+        android:textStyle="italic"
+        />
 
     <TextView
         android:id="@+id/content_tv"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        android:padding="16dp"
+        android:textColor="@color/black"
+        android:maxLines="5"/>
+
+    <Button
+        android:id="@+id/show_more_ib"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:clickable="true"
+        android:focusable="true"
+        android:layout_gravity="right"
+        android:text="@string/show_more_button"
+        android:textColor="@color/colorAccent"
+        android:background="@color/colorPrimary"
+        android:textSize="12sp"/>
+
+    <Button
+        android:id="@+id/show_less_ib"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:clickable="true"
+        android:visibility="gone"
+        android:focusable="true"
+        android:layout_gravity="right"
+        android:text="@string/show_less_button"
+        android:textColor="@color/colorAccent"
+        android:background="@color/colorPrimary"
+        android:textSize="12sp"/>
 
 </LinearLayout>

@@ -117,7 +117,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@id/movie_description_tv"
-            android:text="@string/trailers_title"/>
+            android:text="@string/trailers_title"
+            style="@style/detailTextViewsStyle" />
 
         <android.support.v7.widget.RecyclerView
             android:id="@+id/trailer_recycler_view"
@@ -134,13 +135,16 @@
             android:layout_height="wrap_content"
             android:layout_below="@id/trailer_recycler_view"
             android:text="@string/reviews_title"
+            style="@style/detailTextViewsStyle"
             />
 
         <android.support.v7.widget.RecyclerView
             android:id="@+id/reviews_recycler_view"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@id/reviews_title_tv"/>
+            android:layout_below="@id/reviews_title_tv"
+            android:padding="16dp"
+            android:textColor="@color/black"/>
     </RelativeLayout>
 
 </ScrollView>

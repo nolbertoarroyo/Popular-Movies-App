@@ -5,6 +5,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -40,6 +41,7 @@ public class TrailersRecyclerViewAdapter extends RecyclerView.Adapter<TrailersRe
         ImageView playImage = holder.trailerPlay;
         TextView videoText =  holder.videoLink;
 
+
         videoText.setText(video.getName());
         playImage.setImageResource(android.R.drawable.ic_media_play);
 
@@ -62,6 +64,7 @@ public class TrailersRecyclerViewAdapter extends RecyclerView.Adapter<TrailersRe
 
             this.trailerPlay = (ImageView)itemView.findViewById(R.id.play_image);
             this.videoLink = (TextView)itemView.findViewById(R.id.trailer_title);
+
             itemView.setOnClickListener(this);
 
         }
