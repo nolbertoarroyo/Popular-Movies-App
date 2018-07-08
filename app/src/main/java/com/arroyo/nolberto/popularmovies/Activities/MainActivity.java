@@ -13,10 +13,11 @@ import android.view.MenuItem;
 import android.widget.Toast;
 
 import com.arroyo.nolberto.popularmovies.Adapter.MovieRecyclerViewAdapter;
-import com.arroyo.nolberto.popularmovies.Constants;
+import com.arroyo.nolberto.popularmovies.Utils.Constants;
 import com.arroyo.nolberto.popularmovies.Interfaces.OnListItemClickListener;
 import com.arroyo.nolberto.popularmovies.Interfaces.PopularMoviesService;
 import com.arroyo.nolberto.popularmovies.R;
+import com.arroyo.nolberto.popularmovies.Utils.FavoritesDatabase;
 
 import java.util.ArrayList;
 
@@ -63,6 +64,8 @@ public class MainActivity extends AppCompatActivity implements OnListItemClickLi
         } else if (item.getItemId() == R.id.menu_sort_rating) {
             moviesToLoad = Constants.TOP_RATED_MOVIES_SETTING;
             getMovieList();
+        }else if (item.getItemId() == R.id.menu_Favorites) {
+            openFavoritesList();
         }
         return super.onOptionsItemSelected(item);
     }
@@ -130,5 +133,10 @@ public class MainActivity extends AppCompatActivity implements OnListItemClickLi
         rvLayoutManager = new GridLayoutManager(this, 2);
         recyclerView.setLayoutManager(rvLayoutManager);
 
+    }
+    void openFavoritesList(){
+
+        Intent openFavoritesIntent = new Intent(this, FavoritesActivity.class);
+        startActivity(openFavoritesIntent);
     }
 }

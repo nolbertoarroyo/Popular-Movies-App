@@ -10,25 +10,25 @@ import android.net.Uri;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
+import android.view.View;
+import android.widget.Button;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
-import android.widget.VideoView;
 
-import com.arroyo.nolberto.popularmovies.Adapter.MovieRecyclerViewAdapter;
 import com.arroyo.nolberto.popularmovies.Adapter.MovieReviewsAdapter;
 import com.arroyo.nolberto.popularmovies.Adapter.TrailersRecyclerViewAdapter;
-import com.arroyo.nolberto.popularmovies.Constants;
+import com.arroyo.nolberto.popularmovies.Utils.Constants;
 import com.arroyo.nolberto.popularmovies.Interfaces.OnTrailerClickListener;
 import com.arroyo.nolberto.popularmovies.Interfaces.PopularMoviesService;
 import com.arroyo.nolberto.popularmovies.Model.Response;
 import com.arroyo.nolberto.popularmovies.Model.VideoResults;
 import com.arroyo.nolberto.popularmovies.Model.VideoReviews;
 import com.arroyo.nolberto.popularmovies.R;
+import com.arroyo.nolberto.popularmovies.Utils.FavoritesDatabase;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
@@ -42,15 +42,18 @@ import retrofit2.converter.gson.GsonConverterFactory;
 public class MovieDetailActivity extends AppCompatActivity implements OnTrailerClickListener{
     private ImageView moviePoster, movieBackdrop;
     private TextView overViewTv, movieTitleTv, movieReleaseDateTv, movieRatingTv;
-    Response.MoviesModel movie;
-    ArrayList<VideoReviews.Review>reviewsList;
-    ArrayList<VideoResults.VideoData> videosList;
-    RecyclerView videoRecyclerView;
-    RecyclerView reviewsRecyclerView;
-    TrailersRecyclerViewAdapter videoRvAdapter;
-    RecyclerView.LayoutManager videoRvLayoutManager;
+    private Response.MoviesModel movie;
+    private ArrayList<VideoReviews.Review>reviewsList;
+    private ArrayList<VideoResults.VideoData> videosList;
+    private RecyclerView videoRecyclerView;
+    private RecyclerView reviewsRecyclerView;
+    private TrailersRecyclerViewAdapter videoRvAdapter;
+    private RecyclerView.LayoutManager videoRvLayoutManager;
     private MovieReviewsAdapter rvAdapter;
     private RecyclerView.LayoutManager rvLayoutManager;
+    private Button favoritesButton;
+    private FavoritesDatabase favsDb;
+    private int movieId = -1;
 
 
     @Override
@@ -65,6 +68,7 @@ public class MovieDetailActivity extends AppCompatActivity implements OnTrailerC
 
             actionBar.setDisplayHomeAsUpEnabled(true);
         }
+        favsDb = FavoritesDatabase.getDbInstance(getApplicationContext());
         setViews();
 
         //receiving movie object from mainActivity and populating views with new data
@@ -74,7 +78,7 @@ public class MovieDetailActivity extends AppCompatActivity implements OnTrailerC
         overViewTv.setText(movie.getOverview());
         movieTitleTv.setText(movie.getOriginal_title());
         String pic = Constants.MOVIE_BACKDROP_BASE_URL + movie.getBackdrop_path();
-        String moviePosterUrl = Constants.MOVIE_POSTER_BASE_URL + movie.getPoster_path();
+        final String moviePosterUrl = Constants.MOVIE_POSTER_BASE_URL + movie.getPoster_path();
         movieReleaseDateTv.setText(movie.getRelease_date());
         double rating = movie.getVote_average();
         movieRatingTv.setText(String.valueOf(rating));
@@ -84,6 +88,33 @@ public class MovieDetailActivity extends AppCompatActivity implements OnTrailerC
         setDetailRecyclerView();
         getReviewsList();
         getVideoList();
+        movieId = movie.getDb_id();
+        favoritesButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(favsDb.movieDao().loadTaskById(movie.getId())==null){
+                    favoritesButton.setText("remove favorite");
+                    favoritesButton.setBackgroundColor(getResources().getColor(R.color.colorPrimary));
+                    favsDb.movieDao().insertFavorite(movie);
+                    Toast.makeText(MovieDetailActivity.this, "added " + movie.getTitle(), Toast.LENGTH_SHORT).show();
+                }else{
+                    favoritesButton.setText("add to favorites");
+                    favoritesButton.setBackgroundColor(getResources().getColor(R.color.colorAccent));
+                    favsDb.movieDao().delete(movie.getId());
+                    Toast.makeText(MovieDetailActivity.this, " deleted" + movie.getTitle(), Toast.LENGTH_SHORT).show();
+
+                    if (favsDb.movieDao().loadTaskById(movie.getId())!=null){
+                        Response.MoviesModel mo = favsDb.movieDao().loadTaskById(movie.getId());
+                        Toast.makeText(MovieDetailActivity.this," still there"+ mo.getDb_id() , Toast.LENGTH_SHORT).show();
+
+
+                    }
+                }
+
+
+
+            }
+        });
 
 
     }
@@ -94,6 +125,7 @@ public class MovieDetailActivity extends AppCompatActivity implements OnTrailerC
         movieTitleTv = (TextView) findViewById(R.id.detail_movie_title_tv);
         movieReleaseDateTv = (TextView) findViewById(R.id.release_date_value_tv);
         movieRatingTv = (TextView) findViewById(R.id.movie_rating_value_tv);
+        favoritesButton = (Button) findViewById(R.id.add_favorite_btn);
     }
 
     void getReviewsList() {

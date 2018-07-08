@@ -1,4 +1,4 @@
-package com.arroyo.nolberto.popularmovies;
+package com.arroyo.nolberto.popularmovies.Utils;
 
 public class Constants {
 
@@ -20,6 +20,10 @@ public class Constants {
     public static final String GET_TOP_RATED_MOVIES = "3/movie/top_rated?api_key=";
     public static final String GET_MOVIE_VIDEO = "3/movie/{movie_id}/videos?api_key=";
     public static final String GET_MOVIE_REVIEWS = "3/movie/{movie_id}/reviews?api_key=";
+
+
+    //database
+    public static final String FavoritesDatabaseName = "favorites";
 
 
 }

@@ -8,7 +8,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.arroyo.nolberto.popularmovies.Constants;
+import com.arroyo.nolberto.popularmovies.Utils.Constants;
 import com.arroyo.nolberto.popularmovies.Interfaces.OnListItemClickListener;
 import com.arroyo.nolberto.popularmovies.Model.Response;
 import com.arroyo.nolberto.popularmovies.R;
