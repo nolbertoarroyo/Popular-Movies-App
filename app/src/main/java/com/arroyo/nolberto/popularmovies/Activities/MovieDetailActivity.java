@@ -21,6 +21,7 @@ import android.widget.Toast;
 
 import com.arroyo.nolberto.popularmovies.Adapter.MovieReviewsAdapter;
 import com.arroyo.nolberto.popularmovies.Adapter.TrailersRecyclerViewAdapter;
+import com.arroyo.nolberto.popularmovies.Utils.AppExecutors;
 import com.arroyo.nolberto.popularmovies.Utils.Constants;
 import com.arroyo.nolberto.popularmovies.Interfaces.OnTrailerClickListener;
 import com.arroyo.nolberto.popularmovies.Interfaces.PopularMoviesService;
@@ -53,7 +54,7 @@ public class MovieDetailActivity extends AppCompatActivity implements OnTrailerC
     private RecyclerView.LayoutManager rvLayoutManager;
     private Button favoritesButton;
     private FavoritesDatabase favsDb;
-    private int movieId = -1;
+    private Boolean favoriteExists;
 
 
     @Override
@@ -88,31 +89,22 @@ public class MovieDetailActivity extends AppCompatActivity implements OnTrailerC
         setDetailRecyclerView();
         getReviewsList();
         getVideoList();
-        movieId = movie.getDb_id();
         favoritesButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(favsDb.movieDao().loadTaskById(movie.getId())==null){
+                if (favsDb.movieDao().loadTaskById(movie.getId())==null){
+                    insertFavorite();
                     favoritesButton.setText("remove favorite");
                     favoritesButton.setBackgroundColor(getResources().getColor(R.color.colorPrimary));
-                    favsDb.movieDao().insertFavorite(movie);
                     Toast.makeText(MovieDetailActivity.this, "added " + movie.getTitle(), Toast.LENGTH_SHORT).show();
+
                 }else{
+                    deleteFavorite();
                     favoritesButton.setText("add to favorites");
                     favoritesButton.setBackgroundColor(getResources().getColor(R.color.colorAccent));
-                    favsDb.movieDao().delete(movie.getId());
                     Toast.makeText(MovieDetailActivity.this, " deleted" + movie.getTitle(), Toast.LENGTH_SHORT).show();
 
-                    if (favsDb.movieDao().loadTaskById(movie.getId())!=null){
-                        Response.MoviesModel mo = favsDb.movieDao().loadTaskById(movie.getId());
-                        Toast.makeText(MovieDetailActivity.this," still there"+ mo.getDb_id() , Toast.LENGTH_SHORT).show();
-
-
-                    }
                 }
-
-
-
             }
         });
 
@@ -237,5 +229,35 @@ public class MovieDetailActivity extends AppCompatActivity implements OnTrailerC
             startActivity(browserIntent);
         }
 
+    }
+    public void insertFavorite(){
+        AppExecutors.getInstance().diskIO().execute(new Runnable() {
+            @Override
+            public void run() {
+                    favsDb.movieDao().insertFavorite(movie);
+
+
+            }
+        });
+    }
+    public void deleteFavorite(){
+        AppExecutors.getInstance().diskIO().execute(new Runnable() {
+            @Override
+            public void run() {
+                    favsDb.movieDao().delete(movie.getId());
+
+            }
+        });
+    }
+
+    public Boolean checkIfFavorite(){
+
+AppExecutors.getInstance().diskIO().execute(new Runnable() {
+    @Override
+    public void run() {
+
+    }
+
+});return favoriteExists;
     }
 }

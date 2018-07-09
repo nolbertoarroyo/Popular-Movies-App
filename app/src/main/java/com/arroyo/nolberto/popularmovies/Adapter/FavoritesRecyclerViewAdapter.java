@@ -42,10 +42,14 @@ public class FavoritesRecyclerViewAdapter extends RecyclerView.Adapter<Favorites
 
         @Override
         public int getItemCount() {
+            if (favorites == null) {
+                return 0;
+            }
             return favorites.size();
         }
-    public void addItems(List<Response.MoviesModel> favorites) {
-        this.favorites = favorites;
+
+    public void addItems(List<Response.MoviesModel> favs) {
+        this.favorites = favs;
         notifyDataSetChanged();
     }
     public List<Response.MoviesModel> getFavorites() {

@@ -66,6 +66,7 @@ public class MainActivity extends AppCompatActivity implements OnListItemClickLi
             getMovieList();
         }else if (item.getItemId() == R.id.menu_Favorites) {
             openFavoritesList();
+            FavoritesDatabase testDB = FavoritesDatabase.getDbInstance(MainActivity.this);
         }
         return super.onOptionsItemSelected(item);
     }
