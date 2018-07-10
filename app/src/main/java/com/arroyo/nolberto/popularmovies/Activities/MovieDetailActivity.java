@@ -2,11 +2,13 @@ package com.arroyo.nolberto.popularmovies.Activities;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
+import android.preference.PreferenceManager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -54,8 +56,23 @@ public class MovieDetailActivity extends AppCompatActivity implements OnTrailerC
     private RecyclerView.LayoutManager rvLayoutManager;
     private Button favoritesButton;
     private FavoritesDatabase favsDb;
-    private Boolean favoriteExists;
+    private Boolean favoriteExists = false;
+    SharedPreferences preferences;
+    SharedPreferences.Editor editor;
 
+
+    @Override
+    protected void onResume() {
+        this.favoriteExists = preferences.getBoolean("favorite_exists"+ movie.getId(), false);
+        if (favoriteExists){
+            favoritesButton.setText("remove favorite");
+            favoritesButton.setBackgroundColor(getResources().getColor(R.color.colorPrimary));
+        }else{
+            favoritesButton.setText("add to favorites");
+            favoritesButton.setBackgroundColor(getResources().getColor(R.color.colorAccent));
+        }
+        super.onResume();
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -69,6 +86,7 @@ public class MovieDetailActivity extends AppCompatActivity implements OnTrailerC
 
             actionBar.setDisplayHomeAsUpEnabled(true);
         }
+        setSharedPreference();
         favsDb = FavoritesDatabase.getDbInstance(getApplicationContext());
         setViews();
 
@@ -92,7 +110,10 @@ public class MovieDetailActivity extends AppCompatActivity implements OnTrailerC
         favoritesButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (favsDb.movieDao().loadTaskById(movie.getId())==null){
+                if (!favoriteExists){
+
+                    favoriteExists = true;
+                    editor.putBoolean("favorite_exists"+ movie.getId(),favoriteExists).apply();
                     insertFavorite();
                     favoritesButton.setText("remove favorite");
                     favoritesButton.setBackgroundColor(getResources().getColor(R.color.colorPrimary));
@@ -103,7 +124,8 @@ public class MovieDetailActivity extends AppCompatActivity implements OnTrailerC
                     favoritesButton.setText("add to favorites");
                     favoritesButton.setBackgroundColor(getResources().getColor(R.color.colorAccent));
                     Toast.makeText(MovieDetailActivity.this, " deleted" + movie.getTitle(), Toast.LENGTH_SHORT).show();
-
+                    favoriteExists = false;
+                    editor.putBoolean("favorite_exists"+ movie.getId(),favoriteExists).apply();
                 }
             }
         });
@@ -259,5 +281,9 @@ AppExecutors.getInstance().diskIO().execute(new Runnable() {
     }
 
 });return favoriteExists;
+    }
+    void setSharedPreference(){
+        preferences = PreferenceManager.getDefaultSharedPreferences(MovieDetailActivity.this);
+        editor = preferences.edit();
     }
 }
