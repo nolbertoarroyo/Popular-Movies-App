@@ -19,7 +19,7 @@ public abstract class FavoritesDatabase extends RoomDatabase {
             synchronized (Lock) {
 
                 databaseInstance = Room.databaseBuilder(context.getApplicationContext(),
-                        FavoritesDatabase.class, Constants.FavoritesDatabaseName).allowMainThreadQueries().build();
+                        FavoritesDatabase.class, Constants.FavoritesDatabaseName).build();
 
             }
 

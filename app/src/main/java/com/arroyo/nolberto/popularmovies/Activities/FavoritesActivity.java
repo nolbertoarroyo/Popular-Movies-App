@@ -6,6 +6,7 @@ import android.arch.lifecycle.ViewModelProviders;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
@@ -18,27 +19,33 @@ import com.arroyo.nolberto.popularmovies.Adapter.FavoritesRecyclerViewAdapter;
 import com.arroyo.nolberto.popularmovies.Model.Response;
 import com.arroyo.nolberto.popularmovies.R;
 import com.arroyo.nolberto.popularmovies.Utils.AppExecutors;
+import com.arroyo.nolberto.popularmovies.Utils.Constants;
 import com.arroyo.nolberto.popularmovies.Utils.FavoritesDatabase;
 import com.arroyo.nolberto.popularmovies.Utils.FavoritesViewModel;
 
 import java.util.List;
 
 public class FavoritesActivity extends AppCompatActivity {
-    FavoritesDatabase favoritesDatabase;
-    RecyclerView favsRV;
-    RecyclerView.LayoutManager rVlayoutManager;
-    FavoritesRecyclerViewAdapter favsAdapter;
+    private FavoritesDatabase favoritesDatabase;
+    private RecyclerView favsRV;
+    private RecyclerView.LayoutManager rVlayoutManager;
+    private FavoritesRecyclerViewAdapter favsAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_favorites);
 
-        favsRV = (RecyclerView) findViewById(R.id.favsRV);
-        rVlayoutManager = new LinearLayoutManager(FavoritesActivity.this);
-        favsRV.setLayoutManager(rVlayoutManager);
-        favsAdapter = new FavoritesRecyclerViewAdapter(FavoritesActivity.this);
-        favsRV.setAdapter(favsAdapter);
+        ActionBar actionBar = getSupportActionBar();
+
+        // Enable the Up button
+        if (actionBar != null){
+
+            actionBar.setDisplayHomeAsUpEnabled(true);
+        }
+        setRecyclerView();
+
+        //adding swipe to delete favorites movie from database and update favorites boolean in SharedPreferences
         new ItemTouchHelper(new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT) {
             @Override
             public boolean onMove(RecyclerView recyclerView, final RecyclerView.ViewHolder viewHolder, RecyclerView.ViewHolder target) {
@@ -56,7 +63,7 @@ public class FavoritesActivity extends AppCompatActivity {
                         favoritesDatabase.movieDao().delete(selectedItem.get(position).getId());
                         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(FavoritesActivity.this);
                         SharedPreferences.Editor editor = preferences.edit();
-                        editor.putBoolean("favorite_exists"+selectedItem.get(position).getId(),false).apply();
+                        editor.putBoolean(Constants.FAVORITES_EXISTS_KEY+selectedItem.get(position).getId(),false).apply();
                     }
                 });
             }
@@ -71,5 +78,13 @@ public class FavoritesActivity extends AppCompatActivity {
                 favsAdapter.addItems(moviesModels);
             }
         });
+    }
+
+    private void setRecyclerView() {
+        favsRV = (RecyclerView) findViewById(R.id.favsRV);
+        rVlayoutManager = new LinearLayoutManager(FavoritesActivity.this);
+        favsRV.setLayoutManager(rVlayoutManager);
+        favsAdapter = new FavoritesRecyclerViewAdapter(FavoritesActivity.this);
+        favsRV.setAdapter(favsAdapter);
     }
 }

@@ -25,5 +25,9 @@ public class Constants {
     //database
     public static final String FavoritesDatabaseName = "favorites";
 
+    //keys used in multiple locations
+    public static final String FAVORITES_EXISTS_KEY = "favoritesExists";
+    public static final String MOVIE_ID = "movie_id";
+
 
 }

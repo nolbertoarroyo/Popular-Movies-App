@@ -17,4 +17,9 @@
     <string name="show_more_button">show more</string>
     <string name="show_less_button">show less</string>
     <string name="favorites_menu">Favorites</string>
+    <string name="remove_favorite">remove favorite</string>
+    <string name="add_favorite">add to favorites</string>
+    <string name="added_favorite">added</string>
+    <string name="removed_favorite">deleted</string>
+
 </resources>

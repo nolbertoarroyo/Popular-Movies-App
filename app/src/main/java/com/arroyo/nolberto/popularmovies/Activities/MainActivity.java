@@ -4,6 +4,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.os.Parcelable;
+import android.os.PersistableBundle;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.GridLayoutManager;
@@ -28,17 +30,23 @@ import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
 public class MainActivity extends AppCompatActivity implements OnListItemClickListener {
-    private ArrayList<com.arroyo.nolberto.popularmovies.Model.Response.MoviesModel> popularMoviesList;
     private RecyclerView recyclerView;
     private MovieRecyclerViewAdapter rvAdapter;
     private RecyclerView.LayoutManager rvLayoutManager;
+    private ArrayList<com.arroyo.nolberto.popularmovies.Model.Response.MoviesModel> popularMoviesList;
+    private final String MOVIES_LOADED_KEY = "moviesLoaded";
+    private final String SCROLL_POSITION_KEY = "scrollPosition";
     private String moviesToLoad;
-
+    private int scrollPosition;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        //checking savedInstanceState bundle to see if it has data
+        if (savedInstanceState != null) {
+            moviesToLoad = savedInstanceState.getString(MOVIES_LOADED_KEY);
+        }
 
         //get and display default movie list
         getMovieList();
@@ -46,6 +54,34 @@ public class MainActivity extends AppCompatActivity implements OnListItemClickLi
 
 
     }
+
+    //saving scrollPosition and movies setting
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        scrollPosition = recyclerView.getScrollState();
+        outState.putInt(SCROLL_POSITION_KEY, scrollPosition);
+        outState.putString(MOVIES_LOADED_KEY, moviesToLoad);
+
+
+    }
+
+
+    //restoring scroll Position and setting it to recyclerView
+    @Override
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+        if (savedInstanceState != null) {
+            moviesToLoad = savedInstanceState.getString(MOVIES_LOADED_KEY);
+            scrollPosition = savedInstanceState.getInt(SCROLL_POSITION_KEY);
+            recyclerView.setScrollingTouchSlop(scrollPosition);
+
+
+        }
+
+
+    }
+
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -64,9 +100,8 @@ public class MainActivity extends AppCompatActivity implements OnListItemClickLi
         } else if (item.getItemId() == R.id.menu_sort_rating) {
             moviesToLoad = Constants.TOP_RATED_MOVIES_SETTING;
             getMovieList();
-        }else if (item.getItemId() == R.id.menu_Favorites) {
+        } else if (item.getItemId() == R.id.menu_Favorites) {
             openFavoritesList();
-            FavoritesDatabase testDB = FavoritesDatabase.getDbInstance(MainActivity.this);
         }
         return super.onOptionsItemSelected(item);
     }
@@ -123,7 +158,6 @@ public class MainActivity extends AppCompatActivity implements OnListItemClickLi
         com.arroyo.nolberto.popularmovies.Model.Response.MoviesModel selectedMovie = popularMoviesList.get(itemClickedPostion);
         Intent startDetailActivityIntent = new Intent(MainActivity.this, MovieDetailActivity.class);
         startDetailActivityIntent.putExtra(Constants.MOVIES_SELECTED_KEY, selectedMovie);
-
         startActivity(startDetailActivityIntent);
 
 
@@ -135,7 +169,9 @@ public class MainActivity extends AppCompatActivity implements OnListItemClickLi
         recyclerView.setLayoutManager(rvLayoutManager);
 
     }
-    void openFavoritesList(){
+
+    //opens users favorite movies list in FavoritesActivity
+    void openFavoritesList() {
 
         Intent openFavoritesIntent = new Intent(this, FavoritesActivity.class);
         startActivity(openFavoritesIntent);

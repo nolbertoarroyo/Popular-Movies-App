@@ -43,36 +43,23 @@ import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
 public class MovieDetailActivity extends AppCompatActivity implements OnTrailerClickListener{
-    private ImageView moviePoster, movieBackdrop;
-    private TextView overViewTv, movieTitleTv, movieReleaseDateTv, movieRatingTv;
     private Response.MoviesModel movie;
-    private ArrayList<VideoReviews.Review>reviewsList;
-    private ArrayList<VideoResults.VideoData> videosList;
     private RecyclerView videoRecyclerView;
     private RecyclerView reviewsRecyclerView;
     private TrailersRecyclerViewAdapter videoRvAdapter;
     private RecyclerView.LayoutManager videoRvLayoutManager;
     private MovieReviewsAdapter rvAdapter;
     private RecyclerView.LayoutManager rvLayoutManager;
-    private Button favoritesButton;
     private FavoritesDatabase favsDb;
+    private SharedPreferences.Editor editor;
+    private SharedPreferences preferences;
+    private ArrayList<VideoReviews.Review>reviewsList;
+    private ArrayList<VideoResults.VideoData> videosList;
+    private ImageView moviePoster, movieBackdrop;
+    private TextView overViewTv, movieTitleTv, movieReleaseDateTv, movieRatingTv;
+    private Button favoritesButton;
     private Boolean favoriteExists = false;
-    SharedPreferences preferences;
-    SharedPreferences.Editor editor;
 
-
-    @Override
-    protected void onResume() {
-        this.favoriteExists = preferences.getBoolean("favorite_exists"+ movie.getId(), false);
-        if (favoriteExists){
-            favoritesButton.setText("remove favorite");
-            favoritesButton.setBackgroundColor(getResources().getColor(R.color.colorPrimary));
-        }else{
-            favoritesButton.setText("add to favorites");
-            favoritesButton.setBackgroundColor(getResources().getColor(R.color.colorAccent));
-        }
-        super.onResume();
-    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -94,6 +81,39 @@ public class MovieDetailActivity extends AppCompatActivity implements OnTrailerC
         Intent receivedIntent = getIntent();
         movie = receivedIntent.getParcelableExtra(Constants.MOVIES_SELECTED_KEY);
 
+        setMovieDetails();
+        setDetailRecyclerView();
+        getReviewsList();
+        getVideoList();
+
+        //adds or deletes favoriteMovie from favorites database, updates UI
+        favoritesButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (!favoriteExists){
+
+                    favoriteExists = true;
+                    editor.putBoolean(Constants.FAVORITES_EXISTS_KEY+ movie.getId(),favoriteExists).apply();
+                    insertFavorite();
+                    favoritesButton.setText(R.string.remove_favorite);
+                    favoritesButton.setBackgroundColor(getResources().getColor(R.color.colorPrimary));
+                    Toast.makeText(MovieDetailActivity.this, getString(R.string.added_favorite) + " " + movie.getTitle(), Toast.LENGTH_SHORT).show();
+
+                }else{
+                    deleteFavorite();
+                    favoritesButton.setText(R.string.add_favorite);
+                    favoritesButton.setBackgroundColor(getResources().getColor(R.color.colorAccent));
+                    Toast.makeText(MovieDetailActivity.this, getString(R.string.removed_favorite) + " " + movie.getTitle(), Toast.LENGTH_SHORT).show();
+                    favoriteExists = false;
+                    editor.putBoolean(Constants.FAVORITES_EXISTS_KEY+ movie.getId(),favoriteExists).apply();
+                }
+            }
+        });
+
+
+    }
+
+    private void setMovieDetails() {
         overViewTv.setText(movie.getOverview());
         movieTitleTv.setText(movie.getOriginal_title());
         String pic = Constants.MOVIE_BACKDROP_BASE_URL + movie.getBackdrop_path();
@@ -104,34 +124,21 @@ public class MovieDetailActivity extends AppCompatActivity implements OnTrailerC
 
         Picasso.with(this).load(pic).into(movieBackdrop);
         Picasso.with(this).load(moviePosterUrl).into(moviePoster);
-        setDetailRecyclerView();
-        getReviewsList();
-        getVideoList();
-        favoritesButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (!favoriteExists){
-
-                    favoriteExists = true;
-                    editor.putBoolean("favorite_exists"+ movie.getId(),favoriteExists).apply();
-                    insertFavorite();
-                    favoritesButton.setText("remove favorite");
-                    favoritesButton.setBackgroundColor(getResources().getColor(R.color.colorPrimary));
-                    Toast.makeText(MovieDetailActivity.this, "added " + movie.getTitle(), Toast.LENGTH_SHORT).show();
-
-                }else{
-                    deleteFavorite();
-                    favoritesButton.setText("add to favorites");
-                    favoritesButton.setBackgroundColor(getResources().getColor(R.color.colorAccent));
-                    Toast.makeText(MovieDetailActivity.this, " deleted" + movie.getTitle(), Toast.LENGTH_SHORT).show();
-                    favoriteExists = false;
-                    editor.putBoolean("favorite_exists"+ movie.getId(),favoriteExists).apply();
-                }
-            }
-        });
-
-
     }
+
+    @Override
+    protected void onResume() {
+        this.favoriteExists = preferences.getBoolean(Constants.FAVORITES_EXISTS_KEY+ movie.getId(), false);
+        if (favoriteExists){
+            favoritesButton.setText(R.string.remove_favorite);
+            favoritesButton.setBackgroundColor(getResources().getColor(R.color.colorPrimary));
+        }else{
+            favoritesButton.setText(R.string.add_favorite);
+            favoritesButton.setBackgroundColor(getResources().getColor(R.color.colorAccent));
+        }
+        super.onResume();
+    }
+
     void setViews(){
         moviePoster = (ImageView)findViewById(R.id.detail_movie_poster_iv);
         movieBackdrop = (ImageView) findViewById(R.id.detail_movie_thumbnail_iv);
@@ -142,6 +149,7 @@ public class MovieDetailActivity extends AppCompatActivity implements OnTrailerC
         favoritesButton = (Button) findViewById(R.id.add_favorite_btn);
     }
 
+    //api call to get movie reviews
     void getReviewsList() {
         ConnectivityManager connMgr = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
@@ -182,6 +190,7 @@ public class MovieDetailActivity extends AppCompatActivity implements OnTrailerC
         }
     }
 
+    //api call to get movie trailers
     void getVideoList() {
         ConnectivityManager connMgr = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
@@ -233,6 +242,7 @@ public class MovieDetailActivity extends AppCompatActivity implements OnTrailerC
 
     }
 
+    //playing trailer in youtube app, if app not available video opens in browser
     @Override
     public void onTrailerItemClicked(int itemClickedPostion) {
         VideoResults.VideoData video = videosList.get(itemClickedPostion);
@@ -252,6 +262,7 @@ public class MovieDetailActivity extends AppCompatActivity implements OnTrailerC
         }
 
     }
+    //insert movie to favorites db
     public void insertFavorite(){
         AppExecutors.getInstance().diskIO().execute(new Runnable() {
             @Override
@@ -262,6 +273,7 @@ public class MovieDetailActivity extends AppCompatActivity implements OnTrailerC
             }
         });
     }
+    //delete movie from favorites db
     public void deleteFavorite(){
         AppExecutors.getInstance().diskIO().execute(new Runnable() {
             @Override
@@ -272,16 +284,7 @@ public class MovieDetailActivity extends AppCompatActivity implements OnTrailerC
         });
     }
 
-    public Boolean checkIfFavorite(){
 
-AppExecutors.getInstance().diskIO().execute(new Runnable() {
-    @Override
-    public void run() {
-
-    }
-
-});return favoriteExists;
-    }
     void setSharedPreference(){
         preferences = PreferenceManager.getDefaultSharedPreferences(MovieDetailActivity.this);
         editor = preferences.edit();

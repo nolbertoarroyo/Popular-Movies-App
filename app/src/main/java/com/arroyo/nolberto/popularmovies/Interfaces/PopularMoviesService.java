@@ -22,10 +22,10 @@ public interface PopularMoviesService {
     Call<Response> getTopRatedMovies();
 
     @GET(Constants.GET_MOVIE_VIDEO+ BuildConfig.MOVIE_DB_API_KEY)
-    Call<VideoResults> getVideoResults(@Path("movie_id") String movieId);
+    Call<VideoResults> getVideoResults(@Path(Constants.MOVIE_ID) String movieId);
 
     @GET(Constants.GET_MOVIE_REVIEWS+ BuildConfig.MOVIE_DB_API_KEY)
-    Call<VideoReviews> getVideoReviews(@Path("movie_id") String movieId);
+    Call<VideoReviews> getVideoReviews(@Path(Constants.MOVIE_ID) String movieId);
 
 
 }
