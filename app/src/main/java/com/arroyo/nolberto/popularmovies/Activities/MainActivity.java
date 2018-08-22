@@ -1,11 +1,14 @@
 package com.arroyo.nolberto.popularmovies.Activities;
 
+import android.arch.lifecycle.Observer;
+import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Parcelable;
 import android.os.PersistableBundle;
+import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.GridLayoutManager;
@@ -20,8 +23,10 @@ import com.arroyo.nolberto.popularmovies.Interfaces.OnListItemClickListener;
 import com.arroyo.nolberto.popularmovies.Interfaces.PopularMoviesService;
 import com.arroyo.nolberto.popularmovies.R;
 import com.arroyo.nolberto.popularmovies.Utils.FavoritesDatabase;
+import com.arroyo.nolberto.popularmovies.Utils.FavoritesViewModel;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -38,6 +43,8 @@ public class MainActivity extends AppCompatActivity implements OnListItemClickLi
     private final String SCROLL_POSITION_KEY = "scrollPosition";
     private String moviesToLoad;
     private int scrollPosition;
+    FavoritesDatabase favoritesDatabase;
+    List<com.arroyo.nolberto.popularmovies.Model.Response.MoviesModel> favoritesList;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -155,10 +162,8 @@ public class MainActivity extends AppCompatActivity implements OnListItemClickLi
     // Interface passes selected movie object to MovieDetailActivity
     @Override
     public void onListItemClicked(int itemClickedPostion) {
-        com.arroyo.nolberto.popularmovies.Model.Response.MoviesModel selectedMovie = popularMoviesList.get(itemClickedPostion);
-        Intent startDetailActivityIntent = new Intent(MainActivity.this, MovieDetailActivity.class);
-        startDetailActivityIntent.putExtra(Constants.MOVIES_SELECTED_KEY, selectedMovie);
-        startActivity(startDetailActivityIntent);
+
+        openDetailWithSelectedItem(popularMoviesList,itemClickedPostion);
 
 
     }
@@ -173,7 +178,31 @@ public class MainActivity extends AppCompatActivity implements OnListItemClickLi
     //opens users favorite movies list in FavoritesActivity
     void openFavoritesList() {
 
-        Intent openFavoritesIntent = new Intent(this, FavoritesActivity.class);
+        /*Intent openFavoritesIntent = new Intent(this, FavoritesActivity.class);
         startActivity(openFavoritesIntent);
+        */
+
+        favoritesDatabase = FavoritesDatabase.getDbInstance(getApplicationContext());
+        FavoritesViewModel viewModel = ViewModelProviders.of(this).get(FavoritesViewModel.class);
+        viewModel.getFavorites().observe(this, new Observer<List<com.arroyo.nolberto.popularmovies.Model.Response.MoviesModel>>() {
+            @Override
+            public void onChanged(@Nullable final List<com.arroyo.nolberto.popularmovies.Model.Response.MoviesModel> moviesModels) {
+
+                recyclerView.setAdapter(new MovieRecyclerViewAdapter(moviesModels, new OnListItemClickListener() {
+                    @Override
+                    public void onListItemClicked(int itemClickedPostion) {
+                        openDetailWithSelectedItem(moviesModels,itemClickedPostion);
+                    }
+                }));
+            }
+        });
     }
+
+    public void openDetailWithSelectedItem(List<com.arroyo.nolberto.popularmovies.Model.Response.MoviesModel> moviesList, int clickedPosition){
+        com.arroyo.nolberto.popularmovies.Model.Response.MoviesModel selectedMovie = moviesList.get(clickedPosition);
+        Intent startDetailActivityIntent = new Intent(MainActivity.this, MovieDetailActivity.class);
+        startDetailActivityIntent.putExtra(Constants.MOVIES_SELECTED_KEY, selectedMovie);
+        startActivity(startDetailActivityIntent);
+    }
+
 }

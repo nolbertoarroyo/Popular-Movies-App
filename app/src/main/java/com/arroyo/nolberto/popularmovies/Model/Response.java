@@ -71,27 +71,16 @@ public class Response {
         private int db_id;
         private int id;
         private String title;
-        @Ignore
         private int vote_count;
-        @Ignore
         private boolean video;
-        @Ignore
         private double vote_average;
-        @Ignore
         private double popularity;
-        @Ignore
         private String poster_path;
-        @Ignore
         private String original_language;
-        @Ignore
         private String original_title;
-        @Ignore
         private String backdrop_path;
-        @Ignore
         private boolean adult;
-        @Ignore
         private String overview;
-        @Ignore
         private String release_date;
         @Ignore
         private List<Integer> genre_ids;

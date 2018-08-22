@@ -15,15 +15,16 @@ import com.arroyo.nolberto.popularmovies.R;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class MovieRecyclerViewAdapter extends RecyclerView.Adapter<MovieRecyclerViewAdapter.MovieViewHolder>{
-    private ArrayList<Response.MoviesModel> moviesList;
+    private List<Response.MoviesModel> moviesList;
     Context context;
     final OnListItemClickListener movieSelected;
 
 
 
-    public MovieRecyclerViewAdapter(ArrayList<Response.MoviesModel> moviesList, OnListItemClickListener itemSelected) {
+    public MovieRecyclerViewAdapter(List<Response.MoviesModel> moviesList, OnListItemClickListener itemSelected) {
         this.moviesList = moviesList;
         this.movieSelected = itemSelected;
     }
@@ -54,7 +55,15 @@ public class MovieRecyclerViewAdapter extends RecyclerView.Adapter<MovieRecycler
 
     @Override
     public int getItemCount() {
+        if (moviesList == null) {
+            return 0;
+        }
         return moviesList.size();
+    }
+    public void addItems(List<Response.MoviesModel> favs) {
+        moviesList.clear();
+        this.moviesList =  favs;
+        notifyDataSetChanged();
     }
 
 
