@@ -6,6 +6,7 @@ public class Constants {
     public static final String MOVIE_BASE_URL = "https://api.themoviedb.org/";
     public static final String POPULAR_MOVIES_SETTING = "popular movies";
     public static final String TOP_RATED_MOVIES_SETTING = "top-rated movies";
+    public static final String FAVORITES_MOVIES_SETTING = "favorites movies";
     public static final String MOVIES_SELECTED_KEY = "MovieSelected";
 
     //MovieDetailActivity

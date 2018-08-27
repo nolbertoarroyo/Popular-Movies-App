@@ -44,8 +44,6 @@ public class MainActivity extends AppCompatActivity implements OnListItemClickLi
     private String moviesToLoad;
     private int scrollPosition;
     FavoritesDatabase favoritesDatabase;
-    List<com.arroyo.nolberto.popularmovies.Model.Response.MoviesModel> favoritesList;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -108,6 +106,7 @@ public class MainActivity extends AppCompatActivity implements OnListItemClickLi
             moviesToLoad = Constants.TOP_RATED_MOVIES_SETTING;
             getMovieList();
         } else if (item.getItemId() == R.id.menu_Favorites) {
+            moviesToLoad = Constants.FAVORITES_MOVIES_SETTING;
             openFavoritesList();
         }
         return super.onOptionsItemSelected(item);
@@ -175,14 +174,13 @@ public class MainActivity extends AppCompatActivity implements OnListItemClickLi
 
     }
 
-    //opens users favorite movies list in FavoritesActivity
+    //repopulates recyclerView with favorites
     void openFavoritesList() {
 
-        /*Intent openFavoritesIntent = new Intent(this, FavoritesActivity.class);
-        startActivity(openFavoritesIntent);
-        */
+
 
         favoritesDatabase = FavoritesDatabase.getDbInstance(getApplicationContext());
+
         FavoritesViewModel viewModel = ViewModelProviders.of(this).get(FavoritesViewModel.class);
         viewModel.getFavorites().observe(this, new Observer<List<com.arroyo.nolberto.popularmovies.Model.Response.MoviesModel>>() {
             @Override
