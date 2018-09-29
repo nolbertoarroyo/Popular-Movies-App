@@ -35,36 +35,28 @@ import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
 public class MainActivity extends AppCompatActivity implements OnListItemClickListener {
+    private FavoritesViewModel viewModel;
     private RecyclerView recyclerView;
     private MovieRecyclerViewAdapter rvAdapter;
     private RecyclerView.LayoutManager rvLayoutManager;
     private ArrayList<com.arroyo.nolberto.popularmovies.Model.Response.MoviesModel> popularMoviesList;
-    private ArrayList<com.arroyo.nolberto.popularmovies.Model.Response.MoviesModel> favoritesList;
-    private final String MOVIES_LOADED_KEY = "moviesLoaded";
+    private Parcelable mstate;
     private String moviesToLoad;
-    FavoritesViewModel viewModel;
-    Parcelable mstate;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         //checking savedInstanceState bundle to see if it has data
         if (savedInstanceState != null) {
-            moviesToLoad = savedInstanceState.getString(MOVIES_LOADED_KEY);
-        }else{
+            moviesToLoad = savedInstanceState.getString(Constants.MOVIES_LOADED_KEY);
+        } else {
             moviesToLoad = Constants.POPULAR_MOVIES_SETTING;
         }
 
         viewModel = ViewModelProviders.of(this).get(FavoritesViewModel.class);
 
-        //get and display default movie list
-        if( moviesToLoad == Constants.FAVORITES_MOVIES_SETTING){
-            openFavoritesList();
-
-        }else{
-
-            setMovieListObservers();
-        }
+        setLaunchLists();
         setRecyclerView();
 
 
@@ -74,9 +66,9 @@ public class MainActivity extends AppCompatActivity implements OnListItemClickLi
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putString(MOVIES_LOADED_KEY, moviesToLoad);
 
-        outState.putParcelable("rvSaved", rvLayoutManager.onSaveInstanceState());
+        outState.putString(Constants.MOVIES_LOADED_KEY, moviesToLoad);
+        outState.putParcelable(Constants.RECYCLER_VIEW_STATE_KEY, rvLayoutManager.onSaveInstanceState());
 
 
     }
@@ -96,12 +88,10 @@ public class MainActivity extends AppCompatActivity implements OnListItemClickLi
     protected void onRestoreInstanceState(Bundle savedInstanceState) {
         super.onRestoreInstanceState(savedInstanceState);
         if (savedInstanceState != null) {
-            moviesToLoad = savedInstanceState.getString(MOVIES_LOADED_KEY);
-            mstate = savedInstanceState.getParcelable("rvSaved");
+            moviesToLoad = savedInstanceState.getString(Constants.MOVIES_LOADED_KEY);
+            mstate = savedInstanceState.getParcelable(Constants.RECYCLER_VIEW_STATE_KEY);
 
         }
-
-
 
 
     }
@@ -142,22 +132,21 @@ public class MainActivity extends AppCompatActivity implements OnListItemClickLi
     }
 
     //method checks internet connection.  If connection is available Retrofit object is created to make api call and set recyclerView with received data
-   void setMovieListObservers() {
-       viewModel.getMoviesList().observe(this, new Observer<List<com.arroyo.nolberto.popularmovies.Model.Response.MoviesModel>>() {
-           @Override
-           public void onChanged(@Nullable List<com.arroyo.nolberto.popularmovies.Model.Response.MoviesModel> moviesModels) {
-               popularMoviesList = (ArrayList<com.arroyo.nolberto.popularmovies.Model.Response.MoviesModel>) moviesModels;
-               rvAdapter.addItems(moviesModels);
-               recyclerView.setAdapter(rvAdapter);
-           }
-       });
+    void setMovieListObservers() {
+        viewModel.getMoviesList().observe(this, new Observer<List<com.arroyo.nolberto.popularmovies.Model.Response.MoviesModel>>() {
+            @Override
+            public void onChanged(@Nullable List<com.arroyo.nolberto.popularmovies.Model.Response.MoviesModel> moviesModels) {
+                popularMoviesList = (ArrayList<com.arroyo.nolberto.popularmovies.Model.Response.MoviesModel>) moviesModels;
+                rvAdapter.addItems(moviesModels);
+            }
+        });
     }
 
     // Interface passes selected movie object to MovieDetailActivity
     @Override
     public void onListItemClicked(int itemClickedPostion) {
 
-        openDetailWithSelectedItem(popularMoviesList,itemClickedPostion);
+        openDetailWithSelectedItem(popularMoviesList, itemClickedPostion);
 
 
     }
@@ -167,6 +156,8 @@ public class MainActivity extends AppCompatActivity implements OnListItemClickLi
         rvLayoutManager = new GridLayoutManager(this, 2);
         recyclerView.setLayoutManager(rvLayoutManager);
         rvAdapter = new MovieRecyclerViewAdapter(popularMoviesList, MainActivity.this);
+        recyclerView.setAdapter(rvAdapter);
+
 
     }
 
@@ -179,18 +170,26 @@ public class MainActivity extends AppCompatActivity implements OnListItemClickLi
 
                 popularMoviesList = (ArrayList<com.arroyo.nolberto.popularmovies.Model.Response.MoviesModel>) moviesModels;
                 rvAdapter.addItems(moviesModels);
-                recyclerView.setAdapter(rvAdapter);
             }
         });
     }
 
-    public void openDetailWithSelectedItem(List<com.arroyo.nolberto.popularmovies.Model.Response.MoviesModel> moviesList, int clickedPosition){
+    public void openDetailWithSelectedItem(List<com.arroyo.nolberto.popularmovies.Model.Response.MoviesModel> moviesList, int clickedPosition) {
         com.arroyo.nolberto.popularmovies.Model.Response.MoviesModel selectedMovie = moviesList.get(clickedPosition);
         Intent startDetailActivityIntent = new Intent(MainActivity.this, MovieDetailActivity.class);
         startDetailActivityIntent.putExtra(Constants.MOVIES_SELECTED_KEY, selectedMovie);
         startActivity(startDetailActivityIntent);
     }
 
+    public void setLaunchLists() {
+        //get and display default movie list
+        if (moviesToLoad == Constants.FAVORITES_MOVIES_SETTING) {
+            openFavoritesList();
 
+        } else {
+
+            setMovieListObservers();
+        }
+    }
 
 }

@@ -17,11 +17,10 @@ import com.squareup.picasso.Picasso;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MovieRecyclerViewAdapter extends RecyclerView.Adapter<MovieRecyclerViewAdapter.MovieViewHolder>{
+public class MovieRecyclerViewAdapter extends RecyclerView.Adapter<MovieRecyclerViewAdapter.MovieViewHolder> {
     private List<Response.MoviesModel> moviesList;
     Context context;
     final OnListItemClickListener movieSelected;
-
 
 
     public MovieRecyclerViewAdapter(List<Response.MoviesModel> moviesList, OnListItemClickListener itemSelected) {
@@ -33,9 +32,9 @@ public class MovieRecyclerViewAdapter extends RecyclerView.Adapter<MovieRecycler
     public MovieViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
 
         context = parent.getContext();
-        int listItem= R.layout.list_item;
+        int listItem = R.layout.list_item;
         LayoutInflater inflater = LayoutInflater.from(context);
-        View view = inflater.inflate(listItem,parent,false);
+        View view = inflater.inflate(listItem, parent, false);
         MovieViewHolder viewHolder = new MovieViewHolder(view);
         return viewHolder;
     }
@@ -45,7 +44,7 @@ public class MovieRecyclerViewAdapter extends RecyclerView.Adapter<MovieRecycler
         Response.MoviesModel movie = moviesList.get(position);
         ImageView movieImage = holder.movieThumbnail;
         TextView title = holder.movieTitle;
-        String pic = Constants.MOVIE_POSTER_BASE_URL+ movie.getPoster_path();
+        String pic = Constants.MOVIE_POSTER_BASE_URL + movie.getPoster_path();
 
         Picasso.with(context).load(pic).into(movieImage);
         title.setText(movie.getOriginal_title());
@@ -60,18 +59,19 @@ public class MovieRecyclerViewAdapter extends RecyclerView.Adapter<MovieRecycler
         }
         return moviesList.size();
     }
+
     public void addItems(List<Response.MoviesModel> favs) {
-       if (moviesList == null){
-           this.moviesList = favs;
-       }else{
-           moviesList.clear();
-           this.moviesList =  favs;
-       }
+        if (moviesList == null) {
+            this.moviesList = favs;
+        } else {
+            moviesList.clear();
+            this.moviesList = favs;
+        }
         notifyDataSetChanged();
     }
 
 
-    class MovieViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
+    class MovieViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
         ImageView movieThumbnail;
         TextView movieTitle;
@@ -79,8 +79,8 @@ public class MovieRecyclerViewAdapter extends RecyclerView.Adapter<MovieRecycler
         public MovieViewHolder(View itemView) {
             super(itemView);
 
-            this.movieThumbnail = (ImageView)itemView.findViewById(R.id.movie_thumbnail_iv);
-            this.movieTitle = (TextView)itemView.findViewById(R.id.movie_title_tv);
+            this.movieThumbnail = (ImageView) itemView.findViewById(R.id.movie_thumbnail_iv);
+            this.movieTitle = (TextView) itemView.findViewById(R.id.movie_title_tv);
             itemView.setOnClickListener(this);
         }
 

@@ -8,6 +8,8 @@ public class Constants {
     public static final String TOP_RATED_MOVIES_SETTING = "top-rated movies";
     public static final String FAVORITES_MOVIES_SETTING = "favorites movies";
     public static final String MOVIES_SELECTED_KEY = "MovieSelected";
+    public static final String MOVIES_LOADED_KEY = "moviesLoaded";
+    public static final String RECYCLER_VIEW_STATE_KEY = "rvState";
 
     //MovieDetailActivity
 

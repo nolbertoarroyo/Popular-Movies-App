@@ -21,7 +21,7 @@ import retrofit2.Callback;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
-public class FavoritesViewModel extends AndroidViewModel{
+public class FavoritesViewModel extends AndroidViewModel {
     private FavoritesDatabase database;
     private LiveData<List<Response.MoviesModel>> favorites;
     private MutableLiveData<List<Response.MoviesModel>> moviesList;
@@ -41,14 +41,15 @@ public class FavoritesViewModel extends AndroidViewModel{
     }
 
     public LiveData<List<Response.MoviesModel>> getMoviesList() {
-        if (moviesList== null){
+        if (moviesList == null) {
             moviesList = new MutableLiveData<List<Response.MoviesModel>>();
             loadMovieList();
         }
         return moviesList;
     }
 
-    public void loadMovieList(){
+    //Api call to retrieve popular movies list or top rated list
+    public void loadMovieList() {
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(Constants.MOVIE_BASE_URL)
                 .addConverterFactory(GsonConverterFactory.create())
@@ -82,16 +83,17 @@ public class FavoritesViewModel extends AndroidViewModel{
 
     public void setMoviesToLoad(String moviesToLoad) {
         this.moviesToLoad = moviesToLoad;
-        if(moviesToLoad != Constants.FAVORITES_MOVIES_SETTING){
+        if (moviesToLoad != Constants.FAVORITES_MOVIES_SETTING) {
 
             loadMovieList();
-        }else {
-            favorites=null;
+        } else {
+            favorites = null;
             getFavorites();
         }
 
     }
-    public void getFavoritesFromDb(){
+
+    public void getFavoritesFromDb() {
         favorites = database.movieDao().loadAllFavorites();
 
     }
