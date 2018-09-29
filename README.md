@@ -1,2 +1,2 @@
 # Popular-Movies-App
-project 2 stage1 android nanodegree
+project 3 stage2 android nanodegree
