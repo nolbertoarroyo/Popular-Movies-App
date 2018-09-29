@@ -22,17 +22,21 @@ import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
 public class FavoritesViewModel extends AndroidViewModel{
+    private FavoritesDatabase database;
     private LiveData<List<Response.MoviesModel>> favorites;
     private MutableLiveData<List<Response.MoviesModel>> moviesList;
     private String moviesToLoad;
 
     public FavoritesViewModel(@NonNull Application application) {
         super(application);
-        FavoritesDatabase database = FavoritesDatabase.getDbInstance(getApplication());
-        favorites = database.movieDao().loadAllFavorites();
+        database = FavoritesDatabase.getDbInstance(getApplication());
     }
 
     public LiveData<List<Response.MoviesModel>> getFavorites() {
+        if (favorites == null) {
+            favorites = new MutableLiveData<>();
+            getFavoritesFromDb();
+        }
         return favorites;
     }
 
@@ -81,7 +85,15 @@ public class FavoritesViewModel extends AndroidViewModel{
         if(moviesToLoad != Constants.FAVORITES_MOVIES_SETTING){
 
             loadMovieList();
+        }else {
+            favorites=null;
+            getFavorites();
         }
 
     }
+    public void getFavoritesFromDb(){
+        favorites = database.movieDao().loadAllFavorites();
+
+    }
+
 }

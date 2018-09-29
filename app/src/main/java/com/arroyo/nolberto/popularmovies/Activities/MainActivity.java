@@ -39,12 +39,11 @@ public class MainActivity extends AppCompatActivity implements OnListItemClickLi
     private MovieRecyclerViewAdapter rvAdapter;
     private RecyclerView.LayoutManager rvLayoutManager;
     private ArrayList<com.arroyo.nolberto.popularmovies.Model.Response.MoviesModel> popularMoviesList;
+    private ArrayList<com.arroyo.nolberto.popularmovies.Model.Response.MoviesModel> favoritesList;
     private final String MOVIES_LOADED_KEY = "moviesLoaded";
-    private final String SCROLL_POSITION_KEY = "scrollPosition";
     private String moviesToLoad;
-    private int scrollPosition;
-    FavoritesDatabase favoritesDatabase;
     FavoritesViewModel viewModel;
+    Parcelable mstate;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -52,11 +51,20 @@ public class MainActivity extends AppCompatActivity implements OnListItemClickLi
         //checking savedInstanceState bundle to see if it has data
         if (savedInstanceState != null) {
             moviesToLoad = savedInstanceState.getString(MOVIES_LOADED_KEY);
+        }else{
+            moviesToLoad = Constants.POPULAR_MOVIES_SETTING;
         }
 
+        viewModel = ViewModelProviders.of(this).get(FavoritesViewModel.class);
 
         //get and display default movie list
-        getMovieList();
+        if( moviesToLoad == Constants.FAVORITES_MOVIES_SETTING){
+            openFavoritesList();
+
+        }else{
+
+            setMovieListObservers();
+        }
         setRecyclerView();
 
 
@@ -68,9 +76,20 @@ public class MainActivity extends AppCompatActivity implements OnListItemClickLi
         super.onSaveInstanceState(outState);
         outState.putString(MOVIES_LOADED_KEY, moviesToLoad);
 
+        outState.putParcelable("rvSaved", rvLayoutManager.onSaveInstanceState());
+
 
     }
 
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        if (mstate != null) {
+            rvLayoutManager.onRestoreInstanceState(mstate);
+        }
+    }
 
     //restoring scroll Position and setting it to recyclerView
     @Override
@@ -78,8 +97,11 @@ public class MainActivity extends AppCompatActivity implements OnListItemClickLi
         super.onRestoreInstanceState(savedInstanceState);
         if (savedInstanceState != null) {
             moviesToLoad = savedInstanceState.getString(MOVIES_LOADED_KEY);
+            mstate = savedInstanceState.getParcelable("rvSaved");
 
         }
+
+
 
 
     }
@@ -93,17 +115,24 @@ public class MainActivity extends AppCompatActivity implements OnListItemClickLi
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
+        viewModel.getFavorites().removeObservers(MainActivity.this);
+        viewModel.getMoviesList().removeObservers(MainActivity.this);
+
+
         // checks which setting is selected and makes api call for either popular movies or top rated movies
         if (item.getItemId() == R.id.menu_sort_popular) {
             moviesToLoad = Constants.POPULAR_MOVIES_SETTING;
             viewModel.setMoviesToLoad(moviesToLoad);
+            setMovieListObservers();
             viewModel.loadMovieList();
 
 
         } else if (item.getItemId() == R.id.menu_sort_rating) {
             moviesToLoad = Constants.TOP_RATED_MOVIES_SETTING;
             viewModel.setMoviesToLoad(moviesToLoad);
+            setMovieListObservers();
             viewModel.loadMovieList();
+
         } else if (item.getItemId() == R.id.menu_Favorites) {
             moviesToLoad = Constants.FAVORITES_MOVIES_SETTING;
             viewModel.setMoviesToLoad(moviesToLoad);
@@ -113,12 +142,12 @@ public class MainActivity extends AppCompatActivity implements OnListItemClickLi
     }
 
     //method checks internet connection.  If connection is available Retrofit object is created to make api call and set recyclerView with received data
-   void getMovieList() {
-       viewModel = ViewModelProviders.of(this).get(FavoritesViewModel.class);
+   void setMovieListObservers() {
        viewModel.getMoviesList().observe(this, new Observer<List<com.arroyo.nolberto.popularmovies.Model.Response.MoviesModel>>() {
            @Override
            public void onChanged(@Nullable List<com.arroyo.nolberto.popularmovies.Model.Response.MoviesModel> moviesModels) {
-               rvAdapter = new MovieRecyclerViewAdapter(moviesModels, MainActivity.this);
+               popularMoviesList = (ArrayList<com.arroyo.nolberto.popularmovies.Model.Response.MoviesModel>) moviesModels;
+               rvAdapter.addItems(moviesModels);
                recyclerView.setAdapter(rvAdapter);
            }
        });
@@ -137,20 +166,18 @@ public class MainActivity extends AppCompatActivity implements OnListItemClickLi
         recyclerView = (RecyclerView) findViewById(R.id.recycler_view);
         rvLayoutManager = new GridLayoutManager(this, 2);
         recyclerView.setLayoutManager(rvLayoutManager);
+        rvAdapter = new MovieRecyclerViewAdapter(popularMoviesList, MainActivity.this);
 
     }
 
     //repopulates recyclerView with favorites
     void openFavoritesList() {
 
-
-
-        favoritesDatabase = FavoritesDatabase.getDbInstance(getApplicationContext());
-
         viewModel.getFavorites().observe(this, new Observer<List<com.arroyo.nolberto.popularmovies.Model.Response.MoviesModel>>() {
             @Override
             public void onChanged(@Nullable final List<com.arroyo.nolberto.popularmovies.Model.Response.MoviesModel> moviesModels) {
 
+                popularMoviesList = (ArrayList<com.arroyo.nolberto.popularmovies.Model.Response.MoviesModel>) moviesModels;
                 rvAdapter.addItems(moviesModels);
                 recyclerView.setAdapter(rvAdapter);
             }

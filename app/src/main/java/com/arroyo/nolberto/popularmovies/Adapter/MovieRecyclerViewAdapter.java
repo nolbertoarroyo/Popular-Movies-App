@@ -61,8 +61,12 @@ public class MovieRecyclerViewAdapter extends RecyclerView.Adapter<MovieRecycler
         return moviesList.size();
     }
     public void addItems(List<Response.MoviesModel> favs) {
-        moviesList.clear();
-        this.moviesList =  favs;
+       if (moviesList == null){
+           this.moviesList = favs;
+       }else{
+           moviesList.clear();
+           this.moviesList =  favs;
+       }
         notifyDataSetChanged();
     }
 
